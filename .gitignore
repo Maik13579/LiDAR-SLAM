@@ -2,3 +2,4 @@
 *.pyc
 .vscode/settings.json
 *.pcd
+ros2_wrapping/lidar_slam/params/slam_remapped.rviz

@@ -35,10 +35,6 @@ SlamControlPanel::SlamControlPanel(QWidget* parent)
   this->CreateLayout();
 
   this->visualization_node = std::make_shared<rclcpp::Node>("slam_control_pannel_node");
-
-  this->CommandPublisher = this->visualization_node->create_publisher<lidar_slam_interfaces::msg::SlamCommand>("slam_command", 1);
-  this->SavePcClient     = this->visualization_node->create_client<lidar_slam_interfaces::srv::SavePc>("lidar_slam/save_pc");
-  this->ResetClient      = this->visualization_node->create_client<lidar_slam_interfaces::srv::Reset>("lidar_slam/reset");
 }
 
 //----------------------------------------------------------------------------
@@ -47,13 +43,26 @@ void  SlamControlPanel::onInitialize()
   // Access to rviz node using the context of the plugin
   auto rviz_ros_node = this->getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
 
+  // Declare parameters for topic names with defaults (use rviz node to set params via launchfile)
+  std::string prefix = "slam_control_pannel.";
+  std::string slam_command_topic = rviz_ros_node->declare_parameter<std::string>(prefix + "slam_command_topic", "slam_command");
+  std::string save_pc_service = rviz_ros_node->declare_parameter<std::string>(prefix + "save_pc_service", "lidar_slam/save_pc");
+  std::string reset_service = rviz_ros_node->declare_parameter<std::string>(prefix + "reset_service", "lidar_slam/reset");
+  std::string slam_confidence_topic = rviz_ros_node->declare_parameter<std::string>(prefix + "slam_confidence_topic", "/slam_confidence");
+
   // Create parallel callback group to separate our interfaces from other rviz2 interfaces
   this->SlamCallbackGroup = rviz_ros_node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
   rclcpp::SubscriptionOptions ops;
   ops.callback_group = this->SlamCallbackGroup;
 
-  this->ConfidenceSubscriber = rviz_ros_node->create_subscription<lidar_slam_interfaces::msg::Confidence>("/slam_confidence", 1,
+  // Create subscribers
+  this->ConfidenceSubscriber = rviz_ros_node->create_subscription<lidar_slam_interfaces::msg::Confidence>(slam_confidence_topic, 1,
                                std::bind(&SlamControlPanel::SlamConfidenceCallback, this, std::placeholders::_1), ops);
+
+  // Declare publishers
+  this->CommandPublisher = this->visualization_node->create_publisher<lidar_slam_interfaces::msg::SlamCommand>(slam_command_topic, 1);
+  this->SavePcClient = this->visualization_node->create_client<lidar_slam_interfaces::srv::SavePc>(save_pc_service);
+  this->ResetClient = this->visualization_node->create_client<lidar_slam_interfaces::srv::Reset>(reset_service);
 }
 
 //----------------------------------------------------------------------------
