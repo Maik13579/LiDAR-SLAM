@@ -13,31 +13,14 @@ This is a fork from [Kitware](https://gitlab.kitware.com/keu-computervision/slam
     - [Installation](#installation)
       - [With system dependencies](#with-system-dependencies)
       - [With local dependencies](#with-local-dependencies)
-      - [With Superbuild](#with-superbuild)
-  - [ROS wrapping](#ros-wrapping)
+  - [ROS2 wrapping on Linux](#ros2-wrapping-on-linux)
     - [Dependencies](#dependencies-1)
     - [Installation](#installation-1)
       - [With system dependencies](#with-system-dependencies-1)
       - [With local dependencies](#with-local-dependencies-1)
-      - [With Superbuild](#with-superbuild-1)
+      - [With Docker](#with-docker)
     - [Live usage](#live-usage)
-  - [ROS2 wrapping on Linux](#ros2-wrapping-on-linux)
-    - [Dependencies](#dependencies-2)
-    - [Installation](#installation-2)
-      - [With system dependencies](#with-system-dependencies-2)
-      - [With local dependencies](#with-local-dependencies-2)
-      - [With Superbuild](#with-superbuild-2)
-    - [Live usage](#live-usage-1)
-  - [ROS2 wrapping on Windows 10](#ros2-wrapping-on-windows-10)
-    - [Install dependencies](#install-dependencies)
-      - [Install ROS2 and slam dependencies](#install-ros2-and-slam-dependencies)
-      - [Install pcl-conversions](#install-pcl-conversions)
-    - [Install SLAM package](#install-slam-package)
-  - [ParaView wrapping](#paraview-wrapping)
-    - [Dependencies](#dependencies-3)
-    - [Installation](#installation-3)
-    - [Usage](#usage)
-    - [Use SLAM in LidarView](#use-slam-in-lidarview)
+
 
 ## Introduction and contents
 
@@ -190,6 +173,20 @@ If you want to use a local version of LidarSlam library you can specify to the p
 
  ```bash
  colcon build --base-paths src/slam/ros2_wrapping --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_SLAM_LIB=OFF -DLidarSlam_DIR=path/to/LidarSlam.cmake
+```
+
+#### With Docker
+
+You can build a ROS2 Humble docker image with :
+
+```bash
+docker compose -f docker/compose.yaml build
+```
+
+And start it with :
+
+```bash
+docker compose -f docker/compose.yaml up
 ```
 
 ### Live usage

@@ -1,0 +1,7 @@
+services:
+  slam:
+    container_name: slam
+    extends:
+      file: common.yaml
+      service: .common_nvidia #use .common if you dont have nvidia
+    command: ros2 launch lidar_slam slam_velodyne.py
