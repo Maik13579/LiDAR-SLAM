@@ -150,21 +150,24 @@ def generate_launch_description():
         DeclareLaunchArgument("use_sim_time", default_value="true", description="Use simulation time when replaying rosbags with '--clock' option."),
         DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
         DeclareLaunchArgument("outdoor", default_value="true", description="Use outdoor configuration for SLAM"),
-        DeclareLaunchArgument("aggregate", default_value="false", description="Run aggregation node"),
+        DeclareLaunchArgument("aggregate", default_value="true", description="Run aggregation node"),
 
         # Topics
-        DeclareLaunchArgument("lidar_points_topic", default_value="lidar_points", description="Topic from which to get the point cloud"),
         DeclareLaunchArgument("slam_command_topic", default_value="slam/command", description="Topic to which to subscribe the SLAM command"),
         DeclareLaunchArgument("slam_confidence_topic", default_value="slam/confidence", description="Topic to which to publish the SLAM confidence"),
         DeclareLaunchArgument("slam_odom_topic", default_value="slam/odom", description="Topic to which to publish the SLAM odometry"),
         DeclareLaunchArgument("slam_predicted_odom_topic", default_value="slam/predicted_odom", description="Topic to which to publish the SLAM predicted odometry"),
         DeclareLaunchArgument("slam_registered_points_topic", default_value="slam/registered_points", description="Topic to which to publish the SLAM registered points"),
         DeclareLaunchArgument("aggregated_cloud_topic", default_value="slam/aggregated_cloud", description="Topic to which to publish the aggregated point cloud"),
+        DeclareLaunchArgument("clicked_point_topic", default_value="slam/clicked_point", description="Topic from which to get the clicked point"),
+        DeclareLaunchArgument("set_slam_pose_topic", default_value="slam/set_slam_pose", description="Topic from which to set the SLAM pose"),
+
+        # Sensor Topics
+        DeclareLaunchArgument("lidar_points_topic", default_value="lidar_points", description="Topic from which to get the point cloud"),
         DeclareLaunchArgument("tags_topic", default_value="tag_detections", description="Topic from which to get the tag measurements"),
         DeclareLaunchArgument("camera_topic", default_value="camera", description="Topic from which to get the RGB camera data"),
         DeclareLaunchArgument("camera_info_topic", default_value="camera_info", description="Topic from which to get the RGB camera info"),
-        DeclareLaunchArgument("clicked_point_topic", default_value="clicked_point", description="Topic from which to get the clicked point"),
-        DeclareLaunchArgument("set_slam_pose_topic", default_value="slam/set_slam_pose", description="Topic from which to set the SLAM pose"),
+
 
         # Topic Keypoints
         DeclareLaunchArgument("keypoints_edges_topic", default_value="slam/keypoints/edges", description="Topic from which to get the keypoints edges"),
