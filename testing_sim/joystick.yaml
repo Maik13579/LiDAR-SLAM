@@ -1,7 +1,7 @@
 teleop_twist_joy_node: #https://github.com/ros2/teleop_twist_joy/tree/humble
   ros__parameters:
     axis_linear:
-      x: 2 #left joy stick vertical
+      x: 1 #left joy stick vertical
     scale_linear:
       x: 0.5
     scale_linear_turbo:
