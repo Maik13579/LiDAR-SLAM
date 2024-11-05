@@ -23,6 +23,8 @@
   <depend>rviz_rendering</depend>
   <depend>rviz_default_plugins</depend>
   <depend>lidar_slam</depend>
+  <depend>lidar_slam_interfaces</depend>
+
 
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>.

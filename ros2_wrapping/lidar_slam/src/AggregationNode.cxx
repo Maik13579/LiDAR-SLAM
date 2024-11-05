@@ -60,12 +60,12 @@ AggregationNode::AggregationNode(std::string name_node, const rclcpp::NodeOption
             "slam_odom", 1, std::bind(&AggregationNode::PoseCallback, this, std::placeholders::_1));
 
   // Init service
-  this->SaveService = this->create_service<lidar_slam::srv::SavePc>(
+  this->SaveService = this->create_service<lidar_slam_interfaces::srv::SavePc>(
       "lidar_slam/save_pc",
       std::bind(&AggregationNode::SavePointcloudService, this, std::placeholders::_1, std::placeholders::_2));
 
   // Init service
-  this->RstService = this->create_service<lidar_slam::srv::Reset>(
+  this->RstService = this->create_service<lidar_slam_interfaces::srv::Reset>(
       "lidar_slam/reset",
       std::bind(&AggregationNode::ResetService, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -345,8 +345,8 @@ void AggregationNode::Callback(const Pcl2_msg& registeredCloudMsg)
 
 //------------------------------------------------------------------------------
 void AggregationNode::SavePointcloudService(
-    const std::shared_ptr<lidar_slam::srv::SavePc::Request> req,
-    const std::shared_ptr<lidar_slam::srv::SavePc::Response> res)
+    const std::shared_ptr<lidar_slam_interfaces::srv::SavePc::Request> req,
+    const std::shared_ptr<lidar_slam_interfaces::srv::SavePc::Response> res)
 {
   std::string outputPrefix = req->output_prefix_path.empty() ? std::getenv("HOME") : req->output_prefix_path;
   boost::filesystem::path outputPrefixPath(outputPrefix);
@@ -367,8 +367,8 @@ void AggregationNode::SavePointcloudService(
 }
 
 //------------------------------------------------------------------------------
-void AggregationNode::ResetService(const std::shared_ptr<lidar_slam::srv::Reset::Request> req,
-                                   const std::shared_ptr<lidar_slam::srv::Reset::Response> res)
+void AggregationNode::ResetService(const std::shared_ptr<lidar_slam_interfaces::srv::Reset::Request> req,
+                                   const std::shared_ptr<lidar_slam_interfaces::srv::Reset::Response> res)
 {
   this->DenseMap->Reset();
   RCLCPP_INFO_STREAM(this->get_logger(), "Resetting aggregation");

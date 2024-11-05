@@ -82,14 +82,6 @@ if (teaserpp_FOUND)
   set(teaserpp_def USE_TEASERPP=1)
 endif()
 
-# NOMINMAX needs to be defined to remove macro file windows.h
-# this file causes error when using min max from std
-# windows.h is included by some dependencies (e.g. glog)
-if (WIN32)
-  set(windows_def NOMINMAX)
-  message(AUTHOR_WARNING "NOMINMAX is defined for windows to solve dependencies windows.h inclusion.")
-endif()
-
 target_compile_definitions(LidarSlam
   PUBLIC
     ${g2o_def}
@@ -98,14 +90,6 @@ target_compile_definitions(LidarSlam
     ${teaserpp_def}
     ${windows_def}
 )
-
-# To allow big path on windows
-if (WIN32)
-  target_compile_options(LidarSlam
-  PRIVATE
-    "/bigobj"
-  )
-endif()
 
 # Prefer rpath over runpath to bypass LD_LIBRARY_PATH at runtime (which can be set by ROS notably)
 # See https://stackoverflow.com/questions/47117443/dynamic-linking-with-rpath-not-working-under-ubuntu-17-10/47243544#47243544

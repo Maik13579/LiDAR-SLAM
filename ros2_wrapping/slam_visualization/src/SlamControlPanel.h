@@ -24,10 +24,10 @@
 
 #include <pluginlib/class_list_macros.hpp>
 
-#include <lidar_slam/msg/confidence.hpp>
-#include <lidar_slam/msg/slam_command.hpp>
-#include <lidar_slam/srv/save_pc.hpp>
-#include <lidar_slam/srv/reset.hpp>
+#include <lidar_slam_interfaces/msg/confidence.hpp>
+#include <lidar_slam_interfaces/msg/slam_command.hpp>
+#include <lidar_slam_interfaces/srv/save_pc.hpp>
+#include <lidar_slam_interfaces/srv/reset.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/publisher_base.hpp>
@@ -148,16 +148,16 @@ private:
    * @brief SLAM confidence callback.
    * @param[in] confidence Confidence values.
    */
-  void SlamConfidenceCallback(const lidar_slam::msg::Confidence& confidence);
+  void SlamConfidenceCallback(const lidar_slam_interfaces::msg::Confidence& confidence);
 
   //----------------------------------------------------------------------------
   /*!
    * @brief Send a command to the SLAM node.
-   * @param[in] command Command type. See the enum in lidar_slam::msg::SlamCommand
+   * @param[in] command Command type. See the enum in lidar_slam_interfaces::msg::SlamCommand
    * @param[in] arg Optional command arg.
    */
-  void SendCommand(lidar_slam::msg::SlamCommand::_command_type command,
-    lidar_slam::msg::SlamCommand::_string_arg_type arg = "");
+  void SendCommand(lidar_slam_interfaces::msg::SlamCommand::_command_type command,
+    lidar_slam_interfaces::msg::SlamCommand::_string_arg_type arg = "");
 
   //----------------------------------------------------------------------------
 
@@ -171,10 +171,10 @@ private:
   // ROS interface
   rclcpp::Node::SharedPtr visualization_node;
   rclcpp::CallbackGroup::SharedPtr SlamCallbackGroup;
-  rclcpp::Publisher<lidar_slam::msg::SlamCommand>::SharedPtr CommandPublisher;
-  rclcpp::Subscription<lidar_slam::msg::Confidence>::SharedPtr ConfidenceSubscriber;
-  rclcpp::Client<lidar_slam::srv::SavePc>::SharedPtr SavePcClient;
-  rclcpp::Client<lidar_slam::srv::Reset>::SharedPtr ResetClient;
+  rclcpp::Publisher<lidar_slam_interfaces::msg::SlamCommand>::SharedPtr CommandPublisher;
+  rclcpp::Subscription<lidar_slam_interfaces::msg::Confidence>::SharedPtr ConfidenceSubscriber;
+  rclcpp::Client<lidar_slam_interfaces::srv::SavePc>::SharedPtr SavePcClient;
+  rclcpp::Client<lidar_slam_interfaces::srv::Reset>::SharedPtr ResetClient;
 };
 
 } // namespace lidar_visualization.

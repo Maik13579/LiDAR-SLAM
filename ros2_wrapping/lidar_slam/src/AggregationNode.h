@@ -33,8 +33,8 @@
 
 // Local
 #include "ros_transform_utils.h"
-#include <lidar_slam/srv/save_pc.hpp>
-#include <lidar_slam/srv/reset.hpp>
+#include <lidar_slam_interfaces/srv/save_pc.hpp>
+#include <lidar_slam_interfaces/srv/reset.hpp>
 
 class AggregationNode : public rclcpp::Node
 {
@@ -70,12 +70,12 @@ public:
   void Callback(const Pcl2_msg& registeredCloudMsg);
 
   void SavePointcloudService(
-    const std::shared_ptr<lidar_slam::srv::SavePc::Request> req,
-    const std::shared_ptr<lidar_slam::srv::SavePc::Response> res);
+    const std::shared_ptr<lidar_slam_interfaces::srv::SavePc::Request> req,
+    const std::shared_ptr<lidar_slam_interfaces::srv::SavePc::Response> res);
 
   void ResetService(
-    const std::shared_ptr<lidar_slam::srv::Reset::Request> req,
-    const std::shared_ptr<lidar_slam::srv::Reset::Response> res);
+    const std::shared_ptr<lidar_slam_interfaces::srv::Reset::Request> req,
+    const std::shared_ptr<lidar_slam_interfaces::srv::Reset::Response> res);
 
   void PoseCallback(const nav_msgs::msg::Odometry& poseMsg);
 
@@ -168,8 +168,8 @@ private:
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr SliceAreaPublisher;
   rclcpp::Publisher<nav_msgs::msg::OccupancyGrid>::SharedPtr OccupancyPublisher;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr MarkerPublisher;
-  rclcpp::Service<lidar_slam::srv::SavePc>::SharedPtr SaveService;
-  rclcpp::Service<lidar_slam::srv::Reset>::SharedPtr RstService;
+  rclcpp::Service<lidar_slam_interfaces::srv::SavePc>::SharedPtr SaveService;
+  rclcpp::Service<lidar_slam_interfaces::srv::Reset>::SharedPtr RstService;
 
   // Dense map containing aggregated points from all frames
   std::shared_ptr<LidarSlam::RollingGrid> DenseMap;

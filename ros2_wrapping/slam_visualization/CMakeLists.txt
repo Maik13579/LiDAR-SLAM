@@ -12,6 +12,7 @@ find_package(ament_cmake REQUIRED)
 if (NOT WIN32)
     find_package(rclcpp REQUIRED)
     find_package(lidar_slam REQUIRED)
+    find_package(lidar_slam_interfaces REQUIRED)
     find_package(rviz_common REQUIRED)
     find_package(rviz_rendering REQUIRED)
     find_package(rviz_default_plugins REQUIRED)
@@ -33,6 +34,7 @@ if (NOT WIN32)
 
     ament_target_dependencies(${PROJECT_NAME}
         lidar_slam
+        lidar_slam_interfaces
         rclcpp
         rviz_common
         rviz_rendering
