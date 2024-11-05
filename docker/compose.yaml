@@ -4,4 +4,4 @@ services:
     extends:
       file: common.yaml
       service: .common_nvidia #use .common if you dont have nvidia
-    command: ros2 launch lidar_slam slam_velodyne.py
+    command: ros2 launch lidar_slam slam.launch.py aggregate:=true

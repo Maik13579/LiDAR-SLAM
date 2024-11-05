@@ -4,7 +4,7 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, SetEnvironmentVariable
+from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.conditions import IfCondition, UnlessCondition
@@ -13,6 +13,7 @@ from launch.substitutions import LaunchConfiguration
 def generate_launch_description():
 
   lidar_slam_share_path = get_package_share_directory('lidar_slam')
+  slam_launch_path = os.path.join(lidar_slam_share_path, 'launch', 'slam.launch.py')
   lidar_conversion_share_path = get_package_share_directory('lidar_conversions')
 
   ###############
@@ -31,62 +32,25 @@ def generate_launch_description():
                           description="Path to the file containing Ouster driver parameters"),
     DeclareLaunchArgument("metadata_in", default_value=os.path.join(lidar_slam_share_path, 'params', "metadata_OS1_64_1024x10.json"), description="Configuration file for Ouster data to replay"),
     DeclareLaunchArgument("aggregate", default_value="false", description="Run aggregation node"),
-    DeclareLaunchArgument("domain_id", default_value="0", description="Set to different value to avoid interference when several computers running ROS2 on the same network."),
-    SetEnvironmentVariable(name='ROS_DOMAIN_ID',value=LaunchConfiguration('domain_id')),
   ])
 
   ##########
-  ## Rviz ##
+  ## SLAM ##
   ##########
-  rviz_node = Node(
-    package="rviz2",
-    executable="rviz2",
-    arguments=["-d", os.path.join(lidar_slam_share_path, 'params', 'slam.rviz')],
-    parameters=[{'use_sim_time': LaunchConfiguration('replay')}],
-    condition = IfCondition(LaunchConfiguration("rviz")),
+
+  # Include the SLAM launch file
+  slam_launch = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(slam_launch_path),
+    launch_arguments={
+        'use_sim_time': LaunchConfiguration('use_sim_time'),
+        'outdoor': LaunchConfiguration('outdoor'),
+        'rviz': LaunchConfiguration('rviz'),
+        'tags_topic': LaunchConfiguration('tags_topic'),
+        'camera_topic': LaunchConfiguration('camera_topic'),
+        'camera_info_topic': LaunchConfiguration('camera_info_topic'),
+        'aggregate': LaunchConfiguration('aggregate'),
+    }.items()
   )
-
-  #####################
-  ### Ouster driver ###
-  #####################
-
-  #! For now ouster packages are not ported on Windows 10
-  if os.name != 'nt':
-    ouster_driver_path = get_package_share_directory("ouster_ros")
-    ouster_parameters = os.path.join(lidar_slam_share_path, 'params', "ouster_driver_parameters.yaml")
-
-    group_ouster = GroupAction(
-      actions=[
-        # Replay
-        IncludeLaunchDescription(
-          XMLLaunchDescriptionSource([os.path.join(ouster_driver_path, "launch", "replay.launch.xml")]),
-          launch_arguments={
-            "timestamp_mode"  : "TIME_FROM_INTERNAL_OSC",
-            "bag_file"        : "b",
-            "metadata"        : LaunchConfiguration("metadata_in"),
-            "sensor_frame"    : "laser_sensor_frame",
-            "laser_frame"     : "laser_data_frame",
-            "imu_frame"       : "imu_data_frame",
-            "viz"             : "False",
-        }.items(),
-          condition=IfCondition(LaunchConfiguration("replay")),
-        ),
-        # Live
-        IncludeLaunchDescription(
-          PythonLaunchDescriptionSource([os.path.join(ouster_driver_path, "launch", "driver.launch.py")]),
-          launch_arguments={
-            "params_file"     : LaunchConfiguration("driver_parameter_file"),
-            "viz"             : "False",
-        }.items(),
-          condition=UnlessCondition(LaunchConfiguration("replay")),
-        ),
-      ],
-      condition=IfCondition(LaunchConfiguration("os_driver"))
-    )
-
-  ##########
-  ## Slam ##
-  ##########
 
   # Ouster points conversion
   with open(os.path.join(lidar_conversion_share_path, 'params', "conversion_config.yaml"), 'r') as f:
@@ -101,52 +65,42 @@ def generate_launch_description():
     parameters=[params_conversion]
   )
 
-  # Outdoor Lidar Slam node
-  with open(os.path.join(lidar_slam_share_path, 'params', "slam_config_outdoor.yaml"), 'r') as f:
-    params_slam_out = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
-  params_slam_out['use_sim_time'] = LaunchConfiguration("replay")
 
-  slam_outdoor_node = Node(
-    name="lidar_slam",
-    package="lidar_slam",
-    executable="lidar_slam_node",
-    output="screen",
-    parameters=[params_slam_out],
-    remappings=[("tag_detections", LaunchConfiguration("tags_topic")),
-                ("camera", LaunchConfiguration("camera_topic")),
-                ("camera_info", LaunchConfiguration("camera_info_topic")),],
-    condition=IfCondition(LaunchConfiguration("outdoor"))
-  )
+  #####################
+  ### Ouster driver ###
+  #####################
 
-  # Indoor Lidar Slam node
-  with open(os.path.join(lidar_slam_share_path, 'params', "slam_config_indoor.yaml"), 'r') as f:
-    params_slam_in = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
-  params_slam_in['use_sim_time'] = LaunchConfiguration("replay")
 
-  slam_indoor_node = Node(
-    name="lidar_slam",
-    package="lidar_slam",
-    executable="lidar_slam_node",
-    output="screen",
-    parameters=[params_slam_in],
-    remappings=[("tag_detections", LaunchConfiguration("tags_topic")),
-                ("camera", LaunchConfiguration("camera_topic")),
-                ("camera_info", LaunchConfiguration("camera_info_topic")),],
-    condition= UnlessCondition(LaunchConfiguration("outdoor"))
-  )
+  ouster_driver_path = get_package_share_directory("ouster_ros")
+  ouster_parameters = os.path.join(lidar_slam_share_path, 'params', "ouster_driver_parameters.yaml")
 
-  # Aggregation node
-  with open(os.path.join(lidar_slam_share_path, 'params', "aggregation_config.yaml"), 'r') as f:
-    params_aggregation = yaml.safe_load(f)['/aggregation']['ros__parameters']
-  params_aggregation['use_sim_time'] = LaunchConfiguration("replay")
-
-  aggregation_node = Node(
-    name="aggregation",
-    package="lidar_slam",
-    executable="aggregation_node",
-    output="screen",
-    parameters=[params_aggregation],
-    condition=IfCondition(LaunchConfiguration("aggregate"))
+  group_ouster = GroupAction(
+    actions=[
+      # Replay
+      IncludeLaunchDescription(
+        XMLLaunchDescriptionSource([os.path.join(ouster_driver_path, "launch", "replay.launch.xml")]),
+        launch_arguments={
+          "timestamp_mode"  : "TIME_FROM_INTERNAL_OSC",
+          "bag_file"        : "b",
+          "metadata"        : LaunchConfiguration("metadata_in"),
+          "sensor_frame"    : "laser_sensor_frame",
+          "laser_frame"     : "laser_data_frame",
+          "imu_frame"       : "imu_data_frame",
+          "viz"             : "False",
+      }.items(),
+        condition=IfCondition(LaunchConfiguration("replay")),
+      ),
+      # Live
+      IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(ouster_driver_path, "launch", "driver.launch.py")]),
+        launch_arguments={
+          "params_file"     : LaunchConfiguration("driver_parameter_file"),
+          "viz"             : "False",
+      }.items(),
+        condition=UnlessCondition(LaunchConfiguration("replay")),
+      ),
+    ],
+    condition=IfCondition(LaunchConfiguration("os_driver"))
   )
 
   ##########
@@ -225,13 +179,9 @@ def generate_launch_description():
                "--frame-id", "base_link", "--child-frame-id", "ext_sensor"]
   )
 
-  ld.add_action(rviz_node)
   ld.add_action(ouster_conversion_node)
-  if os.name != 'nt':
-    ld.add_action(group_ouster)
-  ld.add_action(slam_outdoor_node)
-  ld.add_action(slam_indoor_node)
-  ld.add_action(aggregation_node)
+  ld.add_action(group_ouster)
+  ld.add_action(slam_launch)
   # TF
   ld.add_action(tf_base_to_os_sensor)
   ld.add_action(tf_base_to_laser_sensor)
