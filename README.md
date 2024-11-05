@@ -102,6 +102,7 @@ There is a gazebo turtlebot 3 simulation (with velodyne) in the testing_sim fold
 After you build the slam image you can start the simulation with :
 
 ```bash
+git submodule update --init
 docker compose -f testing_sim/compose.yaml up
 ```
 
