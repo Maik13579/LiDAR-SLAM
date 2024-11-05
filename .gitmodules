@@ -1,0 +1,3 @@
+[submodule "testing_sim/turtlebot3_simulations"]
+	path = testing_sim/turtlebot3_simulations
+	url = https://github.com/shawns21/turtlebot3_simulations.git

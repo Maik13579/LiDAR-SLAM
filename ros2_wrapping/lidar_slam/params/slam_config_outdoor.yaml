@@ -7,7 +7,7 @@
 
     # SLAM will compute the pose of tracking_frame in odometry_frame coordinates system, using measurements in input pointcloud frames.
     odometry_frame: "map"       # Frame in which SLAM odometry and maps are expressed (default: odom)
-    tracking_frame: "base_link"  # Frame to track (ensure a valid TF tree is published to link input pointcloud frame_id) (default: base_link)
+    tracking_frame: "base_footprint"  # Frame to track (ensure a valid TF tree is published to link input pointcloud frame_id) (default: base_link)
     wheel_frame: "wheel"         # Frame for the wheel encoder
 
     lidars_nb: 1             # Number of lidars used. When various lidars used, keypoints extraction parameters need to be specify for each sensor.

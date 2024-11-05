@@ -11,6 +11,7 @@ This is a fork from [Kitware](https://gitlab.kitware.com/keu-computervision/slam
   - [Core SLAM lib dependencies](#core-slam-lib-dependencies)
   - [ROS2 Dependencies](#ros2-dependencies)
   - [Installation](#installation)
+  - [Testing Sim](#testing-sim)
 
 
 ## Introduction and contents
@@ -29,6 +30,10 @@ Repo contents :
 - `slam_lib/` : core *LidarSlam* library containing SLAM algorithm and other utilities.
 - `ros2_wrapping/`: ROS2 packages to enable SLAM use on a ROS2 system.
 - `CMakeLists.txt` : *CMakeLists* used to call to build core *LidarSlam* lib and *paraview_wrapping*.
+- `testing_sim/` : A Gazebo Turtlebot3 (with velodyne) simulation used for testing.
+
+
+See [ros2_wrapping/lidar_slam/README.md](ros2_wrapping/lidar_slam/README.md) for more details.
 
 ## Core SLAM lib dependencies
 
@@ -89,5 +94,15 @@ And start it with :
 docker compose -f docker/compose.yaml up
 ```
 
-See [ros2_wrapping/lidar_slam/README.md](ros2_wrapping/lidar_slam/README.md) for more details.
 
+## Testing Sim
+
+There is a gazebo turtlebot 3 simulation (with velodyne) in the testing_sim folder.
+
+After you build the slam image you can start the simulation with :
+
+```bash
+docker compose -f testing_sim/compose.yaml up
+```
+
+Starting it for the first time can take a while.
