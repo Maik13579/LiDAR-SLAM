@@ -1,0 +1,10 @@
+services:
+  slam_dev:
+    container_name: slam_dev
+    extends:
+      file: compose.yaml
+      service: slam
+    volumes:
+      - ../ros2_wrapping/lidar_slam/params:/root/slam_ws/install/lidar_slam/share/lidar_slam/params
+      - ../ros2_wrapping/lidar_slam/launch:/root/slam_ws/install/lidar_slam/share/lidar_slam/launch
+    command: tail -f /dev/null
