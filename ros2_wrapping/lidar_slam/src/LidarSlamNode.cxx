@@ -135,7 +135,7 @@ LidarSlamNode::LidarSlamNode(std::string name_node, const rclcpp::NodeOptions& o
 
   initPublisher(SLAM_REGISTERED_POINTS, "slam_registered_points", Pcl2_msg, "output.registered_points", true, 1, false);
 
-  initPublisher(CONFIDENCE, "slam_confidence", lidar_slam::msg::Confidence, "output.confidence", true, 1, false);
+  initPublisher(CONFIDENCE, "slam_confidence", lidar_slam_interfaces::msg::Confidence, "output.confidence", true, 1, false);
 
   if (this->LidarSlam.IsPGOConstraintEnabled(LidarSlam::PGOConstraint::GPS) ||
       this->LidarSlam.IsPGOConstraintEnabled(LidarSlam::PGOConstraint::LANDMARK) ||
@@ -176,7 +176,7 @@ LidarSlamNode::LidarSlamNode(std::string name_node, const rclcpp::NodeOptions& o
   }
 
   // SLAM commands
-  this->SlamCommandSub = this->create_subscription<lidar_slam::msg::SlamCommand>("slam_command", 1,
+  this->SlamCommandSub = this->create_subscription<lidar_slam_interfaces::msg::SlamCommand>("slam_command", 1,
                                                                                  std::bind(&LidarSlamNode::SlamCommandCallback, this, std::placeholders::_1));
 
   // Init logging of GPS data for GPS/SLAM calibration or Pose Graph Optimization.
@@ -1143,13 +1143,13 @@ void LidarSlamNode::SetPoseCallback(const geometry_msgs::msg::PoseWithCovariance
 }
 
 //------------------------------------------------------------------------------
-void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
+void LidarSlamNode::SlamCommandCallback(const lidar_slam_interfaces::msg::SlamCommand& msg)
 {
   // Parse command
   switch(msg.command)
   {
     // Disable SLAM maps update
-    case lidar_slam::msg::SlamCommand::DISABLE_SLAM_MAP_UPDATE:
+    case lidar_slam_interfaces::msg::SlamCommand::DISABLE_SLAM_MAP_UPDATE:
     {
       this->LidarSlam.SetMapUpdate(LidarSlam::MappingMode::NONE);
       RCLCPP_WARN(this->get_logger(), "Disabling SLAM maps update.");
@@ -1157,7 +1157,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Enable the agregation of keypoints to a fixed initial map
-    case lidar_slam::msg::SlamCommand::ENABLE_SLAM_MAP_EXPANSION:
+    case lidar_slam_interfaces::msg::SlamCommand::ENABLE_SLAM_MAP_EXPANSION:
     {
       if (this->LidarSlam.IsRecovery())
         RCLCPP_ERROR_STREAM(this->get_logger(), "Cannot unable map expansion in recovery mode!");
@@ -1167,7 +1167,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Enable the update of the map with new keypoints
-    case lidar_slam::msg::SlamCommand::ENABLE_SLAM_MAP_UPDATE:
+    case lidar_slam_interfaces::msg::SlamCommand::ENABLE_SLAM_MAP_UPDATE:
     {
       if (this->LidarSlam.IsRecovery())
         RCLCPP_ERROR_STREAM(this->get_logger(), "Cannot unable map update in recovery mode!");
@@ -1177,7 +1177,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Reset slam trajectory and update map
-    case lidar_slam::msg::SlamCommand::RESET_TRAJECTORY:
+    case lidar_slam_interfaces::msg::SlamCommand::RESET_TRAJECTORY:
     {
       if (msg.string_arg.empty())
       {
@@ -1193,7 +1193,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Reset the SLAM internal state.
-    case lidar_slam::msg::SlamCommand::RESET_SLAM:
+    case lidar_slam_interfaces::msg::SlamCommand::RESET_SLAM:
     {
       RCLCPP_WARN(this->get_logger(), "Resetting the SLAM internal state.");
       this->LidarSlam.Reset(true);
@@ -1202,7 +1202,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Enable/Disable the SLAM process
-    case lidar_slam::msg::SlamCommand::SWITCH_ON_OFF:
+    case lidar_slam_interfaces::msg::SlamCommand::SWITCH_ON_OFF:
     {
       if (this->SlamEnabled)
         RCLCPP_WARN_STREAM(this->get_logger(), "Disabling the SLAM process");
@@ -1214,7 +1214,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Save current trajectory tracking base frame
-    case lidar_slam::msg::SlamCommand::SAVE_TRAJECTORY:
+    case lidar_slam_interfaces::msg::SlamCommand::SAVE_TRAJECTORY:
     {
       if (msg.string_arg.empty())
       {
@@ -1238,7 +1238,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Save current trajectory tracking Lidar
-    case lidar_slam::msg::SlamCommand::SAVE_LIDAR_TRAJECTORY:
+    case lidar_slam_interfaces::msg::SlamCommand::SAVE_LIDAR_TRAJECTORY:
     {
       if (msg.string_arg.empty())
       {
@@ -1271,7 +1271,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Save SLAM keypoints maps to PCD files
-    case lidar_slam::msg::SlamCommand::SAVE_KEYPOINTS_MAPS:
+    case lidar_slam_interfaces::msg::SlamCommand::SAVE_KEYPOINTS_MAPS:
     {
       RCLCPP_INFO_STREAM(this->get_logger(), "Saving keypoint maps as PCD files in " << msg.string_arg);
       if (this->LidarSlam.GetMapUpdate() == LidarSlam::MappingMode::NONE)
@@ -1291,7 +1291,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Save SLAM keypoints submaps to PCD files
-    case lidar_slam::msg::SlamCommand::SAVE_FILTERED_KEYPOINTS_MAPS:
+    case lidar_slam_interfaces::msg::SlamCommand::SAVE_FILTERED_KEYPOINTS_MAPS:
     {
       RCLCPP_INFO_STREAM(this->get_logger(), "Saving keypoints submaps to PCD.");
       int pcdFormatInt;
@@ -1309,14 +1309,14 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
     }
 
     // Load SLAM keypoints maps from PCD files
-    case lidar_slam::msg::SlamCommand::LOAD_KEYPOINTS_MAPS:
+    case lidar_slam_interfaces::msg::SlamCommand::LOAD_KEYPOINTS_MAPS:
     {
       RCLCPP_INFO_STREAM(this->get_logger(), "Loading keypoints maps from PCD.");
       this->LidarSlam.LoadMapsFromPCD(msg.string_arg);
       break;
     }
 
-    case lidar_slam::msg::SlamCommand::OPTIMIZE_GRAPH:
+    case lidar_slam_interfaces::msg::SlamCommand::OPTIMIZE_GRAPH:
     {
 
       if ((!this->UseExtSensor[LidarSlam::ExternalSensor::GPS] &&
@@ -1366,7 +1366,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
       break;
     }
 
-    case lidar_slam::msg::SlamCommand::LOAD_LOOP_INDICES:
+    case lidar_slam_interfaces::msg::SlamCommand::LOAD_LOOP_INDICES:
     {
       if (!this->LidarSlam.IsPGOConstraintEnabled(LidarSlam::PGOConstraint::LOOP_CLOSURE))
       {
@@ -1398,7 +1398,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
       break;
     }
 
-    case lidar_slam::msg::SlamCommand::SWITCH_SENSOR:
+    case lidar_slam_interfaces::msg::SlamCommand::SWITCH_SENSOR:
     {
       // Get sensor to enable/disable
       LidarSlam::ExternalSensor sensor;
@@ -1419,7 +1419,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
       break;
     }
 
-    case lidar_slam::msg::SlamCommand::CALIBRATE_WITH_POSES:
+    case lidar_slam_interfaces::msg::SlamCommand::CALIBRATE_WITH_POSES:
     {
       // If an input file is provided, load the poses
       if (!msg.string_arg.empty())
@@ -1455,7 +1455,7 @@ void LidarSlamNode::SlamCommandCallback(const lidar_slam::msg::SlamCommand& msg)
       break;
     }
 
-    case lidar_slam::msg::SlamCommand::LOAD_POSES:
+    case lidar_slam_interfaces::msg::SlamCommand::LOAD_POSES:
     {
       // Clear current pose manager
       this->LidarSlam.ResetSensor(true, LidarSlam::ExternalSensor::POSE);
@@ -1629,7 +1629,7 @@ void LidarSlamNode::PublishOutput()
   if (this->Publish[CONFIDENCE])
   {
     // Get SLAM pose
-    lidar_slam::msg::Confidence confidenceMsg;
+    lidar_slam_interfaces::msg::Confidence confidenceMsg;
     confidenceMsg.header.stamp = rclcpp::Time(lastStates.back().Time * 1e9);
     confidenceMsg.header.frame_id = this->OdometryFrameId;
     confidenceMsg.overlap = this->LidarSlam.GetOverlapEstimation();
@@ -1647,7 +1647,7 @@ void LidarSlamNode::PublishOutput()
     confidenceMsg.comply_motion_limits = this->LidarSlam.GetComplyMotionLimits();
     confidenceMsg.std_position_error = this->LidarSlam.GetPositionErrorStd();
     confidenceMsg.failure = this->LidarSlam.HasFailed() || this->LidarSlam.IsRecovery();
-    publishWithCast(this->Publishers[CONFIDENCE], lidar_slam::msg::Confidence, confidenceMsg);
+    publishWithCast(this->Publishers[CONFIDENCE], lidar_slam_interfaces::msg::Confidence, confidenceMsg);
   }
 }
 

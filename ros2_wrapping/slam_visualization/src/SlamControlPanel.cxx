@@ -36,9 +36,9 @@ SlamControlPanel::SlamControlPanel(QWidget* parent)
 
   this->visualization_node = std::make_shared<rclcpp::Node>("slam_control_pannel_node");
 
-  this->CommandPublisher = this->visualization_node->create_publisher<lidar_slam::msg::SlamCommand>("slam_command", 1);
-  this->SavePcClient     = this->visualization_node->create_client<lidar_slam::srv::SavePc>("lidar_slam/save_pc");
-  this->ResetClient      = this->visualization_node->create_client<lidar_slam::srv::Reset>("lidar_slam/reset");
+  this->CommandPublisher = this->visualization_node->create_publisher<lidar_slam_interfaces::msg::SlamCommand>("slam_command", 1);
+  this->SavePcClient     = this->visualization_node->create_client<lidar_slam_interfaces::srv::SavePc>("lidar_slam/save_pc");
+  this->ResetClient      = this->visualization_node->create_client<lidar_slam_interfaces::srv::Reset>("lidar_slam/reset");
 }
 
 //----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ void  SlamControlPanel::onInitialize()
   rclcpp::SubscriptionOptions ops;
   ops.callback_group = this->SlamCallbackGroup;
 
-  this->ConfidenceSubscriber = rviz_ros_node->create_subscription<lidar_slam::msg::Confidence>("/slam_confidence", 1,
+  this->ConfidenceSubscriber = rviz_ros_node->create_subscription<lidar_slam_interfaces::msg::Confidence>("/slam_confidence", 1,
                                std::bind(&SlamControlPanel::SlamConfidenceCallback, this, std::placeholders::_1), ops);
 }
 
@@ -248,9 +248,9 @@ void SlamControlPanel::CreateLayout()
 void SlamControlPanel::ResetSlamState()
 {
   // Send command to reset the SLAM algorithm
-  this->SendCommand(lidar_slam::msg::SlamCommand::RESET_SLAM);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::RESET_SLAM);
   // Call service for aggregation node
-  auto req = std::make_shared<lidar_slam::srv::Reset::Request>();
+  auto req = std::make_shared<lidar_slam_interfaces::srv::Reset::Request>();
   this->ResetClient->async_send_request(req);
 }
 
@@ -258,31 +258,31 @@ void SlamControlPanel::ResetSlamState()
 void SlamControlPanel::ResetSlamTraj()
 {
   QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Trajectory files (*.csv)"));
-  this->SendCommand(lidar_slam::msg::SlamCommand::RESET_TRAJECTORY, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::RESET_TRAJECTORY, filePath.toStdString());
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::DisableMapUpdate()
 {
-  this->SendCommand(lidar_slam::msg::SlamCommand::DISABLE_SLAM_MAP_UPDATE);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::DISABLE_SLAM_MAP_UPDATE);
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::EnableMapExpansion()
 {
-  this->SendCommand(lidar_slam::msg::SlamCommand::ENABLE_SLAM_MAP_EXPANSION);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::ENABLE_SLAM_MAP_EXPANSION);
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::EnableMapUpdate()
 {
-  this->SendCommand(lidar_slam::msg::SlamCommand::ENABLE_SLAM_MAP_UPDATE);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::ENABLE_SLAM_MAP_UPDATE);
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::SwitchOnOff()
 {
-  this->SendCommand(lidar_slam::msg::SlamCommand::SWITCH_ON_OFF);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::SWITCH_ON_OFF);
 }
 
 //----------------------------------------------------------------------------
@@ -293,7 +293,7 @@ void SlamControlPanel::SaveTraj()
   QString extension = fileInfo.suffix();
   if (extension != "csv")
     filePath = fileInfo.path() + "/" + fileInfo.baseName() + ".csv";
-  this->SendCommand(lidar_slam::msg::SlamCommand::SAVE_TRAJECTORY, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::SAVE_TRAJECTORY, filePath.toStdString());
 }
 
 //----------------------------------------------------------------------------
@@ -305,9 +305,9 @@ void SlamControlPanel::SaveMaps()
   if (extension != "")
     filePath = fileInfo.path() + "/" + fileInfo.baseName();
   // Save SLAM keypoint maps
-  this->SendCommand(lidar_slam::msg::SlamCommand::SAVE_FILTERED_KEYPOINTS_MAPS, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::SAVE_FILTERED_KEYPOINTS_MAPS, filePath.toStdString());
   // Save aggregated points if available
-  auto srv = std::make_shared<lidar_slam::srv::SavePc::Request>();
+  auto srv = std::make_shared<lidar_slam_interfaces::srv::SavePc::Request>();
   srv->output_prefix_path = filePath.toStdString();
   srv->format = 0;
   this->SavePcClient->async_send_request(srv);
@@ -317,41 +317,41 @@ void SlamControlPanel::SaveMaps()
 void SlamControlPanel::Calibrate()
 {
   QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Trajectory files (*.csv)"));
-  this->SendCommand(lidar_slam::msg::SlamCommand::CALIBRATE_WITH_POSES, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::CALIBRATE_WITH_POSES, filePath.toStdString());
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::LoadExtTrajectory()
 {
   QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Trajectory files (*.csv)"));
-  this->SendCommand(lidar_slam::msg::SlamCommand::LOAD_POSES, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::LOAD_POSES, filePath.toStdString());
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::LoadLoopIndices()
 {
   QString filePath = QFileDialog::getOpenFileName(this, tr("Open File"), "/home", tr("Loop closure indices file (*.csv)"));
-  this->SendCommand(lidar_slam::msg::SlamCommand::LOAD_LOOP_INDICES, filePath.toStdString());
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::LOAD_LOOP_INDICES, filePath.toStdString());
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::OptimizeGraph()
 {
-  this->SendCommand(lidar_slam::msg::SlamCommand::OPTIMIZE_GRAPH);
+  this->SendCommand(lidar_slam_interfaces::msg::SlamCommand::OPTIMIZE_GRAPH);
 }
 
 //----------------------------------------------------------------------------
 void SlamControlPanel::SendCommand(
-  lidar_slam::msg::SlamCommand::_command_type command, lidar_slam::msg::SlamCommand::_string_arg_type arg)
+  lidar_slam_interfaces::msg::SlamCommand::_command_type command, lidar_slam_interfaces::msg::SlamCommand::_string_arg_type arg)
 {
-  lidar_slam::msg::SlamCommand msg;
+  lidar_slam_interfaces::msg::SlamCommand msg;
   msg.command = command;
   msg.string_arg = std::move(arg);
   this->CommandPublisher->publish(msg);
 }
 
 //----------------------------------------------------------------------------
-void SlamControlPanel::SlamConfidenceCallback(const lidar_slam::msg::Confidence &confidence)
+void SlamControlPanel::SlamConfidenceCallback(const lidar_slam_interfaces::msg::Confidence &confidence)
 {
   QPalette palette1 = this->FailureValueLabel->palette();
   palette1.setColor(this->FailureValueLabel->foregroundRole(),

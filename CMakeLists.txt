@@ -44,20 +44,6 @@ endif()
 #-------------------------
 
 find_package(Boost REQUIRED)
-
-# If the Paraview plugin needs to be compiled, we must find Paraview before PCL.
-# Otherwise, if PCL is built with pcl_visualization module and uses another VTK
-# than the one provided by Paraview, it may override the correct include
-# directories and libraries.
-option(SLAM_PARAVIEW_PLUGIN "Build a Paraview plugin to wrap SLAM" OFF)
-if (SLAM_PARAVIEW_PLUGIN)
-  # Find ParaView
-  find_package(ParaView REQUIRED)
-  # As the PV plugin is a shared library, we also need to ensure that the core
-  # SLAM lib is compatible with position independent code.
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-
 find_package(nanoflann REQUIRED)
 
 # Find Eigen3. If it defines the target, this is used. If not,
@@ -164,16 +150,6 @@ configure_package_config_file(
   "${CMAKE_BINARY_DIR}/LidarSlamConfig.cmake"
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/LidarSlam"
 )
-
-# Is automatically exported in paraview_wrapping with LidarSlamPlugin
-if (NOT SLAM_PARAVIEW_PLUGIN)
-  install(
-    EXPORT LidarSlamLib
-    FILE "LidarSlamLib-targets.cmake"
-    NAMESPACE LidarSlam::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/LidarSlam"
-  )
-endif()
 
 install(
   FILES "${CMAKE_BINARY_DIR}/LidarSlamConfig.cmake"

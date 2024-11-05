@@ -27,6 +27,7 @@ find_package(rosidl_default_generators REQUIRED)
 # Dependencies of LidarSlam
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(lidar_slam_interfaces REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -46,42 +47,6 @@ find_package(cv_bridge)
 # To find shared libraries used by the project at runtime
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-# If lib_name has been installed with the superbuild, set lib_name_DIR to install_path
-function(SET_SB_LIB lib_name lib_install_path)
-  if (EXISTS ${lib_install_path})
-    set("${lib_name}_DIR" ${lib_install_path} CACHE PATH "PATH to ${lib_name} directory")
-    message(STATUS "${lib_name}_DIR set to ${lib_install_path}")
-  else()
-    message(STATUS "${lib_name} not found in SuperBuild")
-  endif()
-endfunction()
-
-# Add path to use superbuild
-if (SUPERBUILD_INSTALL_DIR)
-  # Set dependencies installed with the superbuild
-  SET_SB_LIB(glog "${SUPERBUILD_INSTALL_DIR}/lib/cmake/glog")
-  SET_SB_LIB(Eigen3 "${SUPERBUILD_INSTALL_DIR}/share/eigen3/cmake")
-  SET_SB_LIB(Ceres "${SUPERBUILD_INSTALL_DIR}/lib/cmake/Ceres")
-  SET_SB_LIB(nanoflann "${SUPERBUILD_INSTALL_DIR}/share/nanoflann/cmake")
-  SET_SB_LIB(Boost "${SUPERBUILD_INSTALL_DIR}/lib/cmake/Boost-1.76.0")
-  if (EXISTS "${SUPERBUILD_INSTALL_DIR}/install/include/boost")
-    set(BOOST_ROOT  "${SUPERBUILD_INSTALL_DIR}/install")
-    message(STATUS "BOOST_ROOT set to ${SUPERBUILD_INSTALL_DIR}/install")
-  else()
-    message(STATUS "BOOST_ROOT not found in SuperBuild")
-  endif()
-  SET_SB_LIB(GTSAM "${SUPERBUILD_INSTALL_DIR}/lib/cmake/GTSAM")
-  SET_SB_LIB(g2o "${SUPERBUILD_INSTALL_DIR}/lib/cmake/g2o")
-  if (EXISTS "${SUPERBUILD_INSTALL_DIR}/include/pcl-1.10")
-    message(FATAL_ERROR "PCL was built within the superbuild : this would cause runtime issues so the process is aborted.
-    Rebuild the superbuild from scratch without PCL (`-DINSTALL_PCL=OFF`) and rebuild the ROS package afterwards.")
-  endif()
-  if (NOT BUILD_SLAM_LIB)
-    SET_SB_LIB(LidarSlam "${SUPERBUILD_INSTALL_DIR}/lib/cmake/LidarSlam")
-  endif()
-endif()
-
-
 # Build LidarSlam lib which lies in parent directory
 if (BUILD_SLAM_LIB)
   set(slamlib_from_subdirectory true)
@@ -91,20 +56,6 @@ else()
   find_package(LidarSlam REQUIRED)
   set(LidarSlam_target LidarSlam::LidarSlam)
 endif()
-
-# Generate slam interfaces
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Confidence.msg"
-  "msg/SlamCommand.msg"
-  "srv/SavePc.srv"
-  "srv/Reset.srv"
-  DEPENDENCIES std_msgs
-)
-ament_export_dependencies(rosidl_default_runtime)
-
-# Generate C++ code to use custom interfaces in the same package
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # Add LiDAR SLAM ROS node, link dependencies and librairies
 add_executable(lidar_slam_node
@@ -125,6 +76,7 @@ endif()
 
 set(lidar_slam_dependencies
   rclcpp
+  lidar_slam_interfaces
   tf2_ros
   pcl_conversions
   std_msgs
@@ -151,6 +103,7 @@ add_executable(aggregation_node
 )
 ament_target_dependencies(aggregation_node
   rclcpp
+  lidar_slam_interfaces
   pcl_conversions
   std_msgs
   nav_msgs

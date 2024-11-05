@@ -30,6 +30,7 @@ RUN sh install_nanoflann.sh
 # Copy only the package.xml files to use cache
 COPY ros2_wrapping/lidar_conversions/package.xml ${SLAM_WS}/src/slam/ros2_wrapping/lidar_conversions/package.xml
 COPY ros2_wrapping/lidar_slam/package.xml ${SLAM_WS}/src/slam/ros2_wrapping/lidar_slam/package.xml
+COPY ros2_wrapping/lidar_slam_interfaces/package.xml ${SLAM_WS}/src/slam/ros2_wrapping/lidar_slam_interfaces/package.xml
 COPY ros2_wrapping/slam_visualization/package.xml ${SLAM_WS}/src/slam/ros2_wrapping/slam_visualization/package.xml
 RUN apt update && \
     rosdep update && \
