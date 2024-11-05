@@ -118,30 +118,6 @@ You can link to the local libraries you have installed adding cmake flags. Notab
 cmake ../src -DCMAKE_BUILD_TYPE=Release -DCeres_DIR=path/to/CeresConfig.cmake -Dg2o_DIR=path/to/g2oConfig.cmake
 ```
 
-#### With Superbuild
-
-In your workspace, run :
-
-```bash
-cmake -E make_directory build && cd build
-cmake ../src/slam-superbuild -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j
-```
-
-**NOTE**: By default in the superbuild, mandatory dependencies are installed but optional dependencies are not. You can decide which dependencies to install with the superbuild using the options **INSTALL_XX**. For example, to not build *PCL*:
-```bash
-cmake ../src/slam-superbuild -DCMAKE_BUILD_TYPE=Release -DINSTALL_PCL=OFF
-```
-
-Note that installing and enabling an optional dependency is not the same. If you want to install and enable the use of an optional dependency you need to switch two variables to ON : **INSTALL_XX** and **ENABLE_XX**.
-
-Example for *GTSAM* :
-```bash
-cmake ../src/slam-superbuild -DCMAKE_BUILD_TYPE=Release -DINSTALL_GTSAM=ON -DENABLE_GTSAM=ON
-```
-
-More documentation about the superbuild can be found [here](https://gitlab.kitware.com/keu-computervision/slam-superbuild).
-
 ## ROS2 wrapping on Linux
 
 You can download the ROS2 package in [the artifacts of the CI pipeline](https://gitlab.kitware.com/keu-computervision/slam/-/pipelines) for any version.
@@ -214,40 +190,6 @@ If you want to use a local version of LidarSlam library you can specify to the p
 
  ```bash
  colcon build --base-paths src/slam/ros2_wrapping --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_SLAM_LIB=OFF -DLidarSlam_DIR=path/to/LidarSlam.cmake
-```
-
-#### With Superbuild
-
-This applies if you have some missing dependencies and you don't want any of the previous solutions. The [superbuild](https://gitlab.kitware.com/keu-computervision/slam-superbuild/) that is provided allows to download, build and install them locally so it can be used to build the SLAM packages afterwards. All the mandatory AND optional dependencies can be installed by the superbuild. One can choose the one he wants to install with the variables **INSTALL_XX** (example with PCL below).
-
-**WARNING** It is not possible to use PCL from the superbuild (this would create runtime issues with system version).
-
-**WARNING** The superbuild must be installed outside of catkin workspace.
-
-_Full installation with superbuild example_ :
- ```bash
- # Clone project
- git clone https://gitlab.kitware.com/keu-computervision/slam.git ros2_ws/src/slam --recursive
- # Build Superbuild to install dependencies locally
- cmake -E make_directory SB-build && cd SB-build
- cmake ../ros2_ws/src/slam/slam-superbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DINSTALL_PCL=OFF
- cmake --build . -j
- # Build Slam ROS package pointing to the superbuild install directory
- cd ../ros2_ws
- call path\to\ros2_humble\local_setup.bat
- colcon build --base-paths src/slam/ros2_wrapping --cmake-args -DCMAKE_BUILD_TYPE=Release -DSUPERBUILD_INSTALL_DIR=absolute/path/to/SB-build/install
-```
-
-The default behavior is that the ROS2 wrapping builds the SLAM library, but the superbuild can also install the SLAM library.
-It is possible to use the superbuild one by setting the BUILD_SLAM_SHARED_LIB variable to ON in superbuild build and BUILD_SLAM_LIB to OFF in ROS wrapping build.
-
-Example :
- ```bash
- mkdir SB-build && cd SB-build
- cmake ../ws_ros2/src/slam/slam-superbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DINSTALL_PCL=OFF -DBUILD_SLAM_SHARED_LIB=ON
- cmake --build . -j
- cd ../ws_ros2
- colcon build --base-paths src/slam/ros2_wrapping --cmake-args -DCMAKE_BUILD_TYPE=Release -DSUPERBUILD_INSTALL_DIR=absolute/path/to/SB-build/install -DBUILD_SLAM_LIB=OFF
 ```
 
 ### Live usage
