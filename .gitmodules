@@ -1,3 +1,3 @@
-[submodule "testing_sim/turtlebot3_simulations"]
-	path = testing_sim/turtlebot3_simulations
-	url = https://github.com/shawns21/turtlebot3_simulations.git
+[submodule "testing_sim/clearpath_simulator"]
+	path = testing_sim/clearpath_simulator
+	url = https://github.com/clearpathrobotics/clearpath_simulator.git

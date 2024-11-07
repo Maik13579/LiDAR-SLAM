@@ -8,6 +8,7 @@ services:
     environment:
       ROS_DOMAIN_ID: $ROS_DOMAIN_ID
       DISPLAY: $DISPLAY
+      RMW_IMPLEMENTATION: rmw_fastrtps_cpp #rmw_cyclonedds_cpp
     network_mode: host
     ipc: host
     privileged: true #high security

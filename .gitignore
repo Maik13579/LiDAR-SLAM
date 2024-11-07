@@ -3,3 +3,6 @@
 .vscode/settings.json
 *.pcd
 ros2_wrapping/lidar_slam/params/slam_remapped.rviz
+
+testing_sim/clearpath/*
+!testing_sim/clearpath/robot.yaml

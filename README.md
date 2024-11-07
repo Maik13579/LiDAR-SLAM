@@ -30,7 +30,7 @@ Repo contents :
 - `slam_lib/` : core *LidarSlam* library containing SLAM algorithm and other utilities.
 - `ros2_wrapping/`: ROS2 packages to enable SLAM use on a ROS2 system.
 - `CMakeLists.txt` : *CMakeLists* used to call to build core *LidarSlam* lib and *paraview_wrapping*.
-- `testing_sim/` : A Gazebo Turtlebot3 (with velodyne) simulation used for testing.
+- `testing_sim/` : A Gazebo clearpath husky (with velodyne) simulation used for testing.
 
 
 See [ros2_wrapping/lidar_slam/README.md](ros2_wrapping/lidar_slam/README.md) for more details.
@@ -97,7 +97,7 @@ docker compose -f docker/compose.yaml up
 
 ## Testing Sim
 
-There is a gazebo turtlebot 3 simulation (with velodyne) in the testing_sim folder.
+There is a gazebo clearpath husky simulation (with velodyne) in the testing_sim folder.
 
 After you build the slam image you can start the simulation with :
 
