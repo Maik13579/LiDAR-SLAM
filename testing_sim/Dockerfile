@@ -33,3 +33,5 @@ RUN chmod +x /entrypoint.bash
 ENTRYPOINT ["/entrypoint.bash"]
 COPY world /world
 COPY world/myworld.sdf /root/clearpath_ws/install/clearpath_gz/share/clearpath_gz/worlds/myworld.sdf
+
+COPY a200.urdf.xacro /opt/ros/$ROS_DISTRO/share/clearpath_platform_description/urdf/a200/a200.urdf.xacro
