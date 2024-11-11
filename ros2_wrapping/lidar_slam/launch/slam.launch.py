@@ -5,11 +5,11 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch_ros.actions import Node
-from launch.conditions import IfCondition, UnlessCondition
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 
 
-def update_rviz_topics(context, rviz_config_path, remappings):
+def update_rviz_topics(context, rviz_config_path, remappings, namespace):
     """
     Updates topics in an RViz config file based on provided mappings.
 
@@ -17,6 +17,7 @@ def update_rviz_topics(context, rviz_config_path, remappings):
     - context: Launch context to resolve substitutions.
     - rviz_config_path (str): Path to the RViz config file.
     - remappings (list): A list of tuples where each tuple is (original_topic, new_topic).
+    - namespace (str): Namespace for remapping topics.
     """
     # Resolve LaunchConfiguration substitutions
     resolved_remappings = [
@@ -29,6 +30,8 @@ def update_rviz_topics(context, rviz_config_path, remappings):
 
     # Replace each topic based on the resolved mappings
     for original_topic, new_topic in resolved_remappings:
+        #add namespace to topic
+        new_topic = os.path.join(namespace, new_topic)
         config_data = re.sub(rf'\b{re.escape(original_topic)}\b', new_topic, config_data)
 
     # Save the updated config data back to a new file
@@ -36,7 +39,7 @@ def update_rviz_topics(context, rviz_config_path, remappings):
     with open(new_file_name, 'w') as file:
         file.write(config_data)
 
-    return new_file_name
+    return new_file_name, resolved_remappings
 
 
 def launch_setup(context, *args, **kwargs):
@@ -87,15 +90,21 @@ def launch_setup(context, *args, **kwargs):
         # Services
         ("/lidar_slam/save_pc", LaunchConfiguration("save_pc_service")),
         ("/lidar_slam/reset", LaunchConfiguration("reset_service")),
+
+        # TF
+        ("/tf", LaunchConfiguration("tf_topic")),
+        ("/tf_static", LaunchConfiguration("tf_static_topic")),
     ]
 
     # Update RViz config file and get the path to the modified file
-    new_rviz_config_path = update_rviz_topics(context, rviz_config_path, remappings)
+    namespace = LaunchConfiguration("namespace").perform(context)
+    new_rviz_config_path, resolved_remappings = update_rviz_topics(context, rviz_config_path, remappings, namespace)
     
     # Define the RViz Node with the updated config
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
+        namespace=namespace,
         arguments=["-d", new_rviz_config_path],
         parameters=[{
             'use_sim_time': LaunchConfiguration('use_sim_time'),
@@ -104,6 +113,7 @@ def launch_setup(context, *args, **kwargs):
             'slam_control_pannel.reset_service': LaunchConfiguration('reset_service'),
             'slam_control_pannel.slam_confidence_topic': LaunchConfiguration('slam_confidence_topic'),
         }],
+        remappings=resolved_remappings,
         condition=IfCondition(LaunchConfiguration("rviz"))
     )
 
@@ -117,8 +127,9 @@ def launch_setup(context, *args, **kwargs):
         package="lidar_slam",
         executable="lidar_slam_node",
         output="screen",
+        namespace=namespace,
         parameters=[params_slam_out],
-        remappings=remappings
+        remappings=resolved_remappings
     )
 
     # Aggregate points
@@ -131,8 +142,9 @@ def launch_setup(context, *args, **kwargs):
         package="lidar_slam",
         executable="aggregation_node",
         output="screen",
+        namespace=namespace,
         parameters=[params_aggregation],
-        remappings=remappings,
+        remappings=resolved_remappings,
         condition=IfCondition(LaunchConfiguration("aggregate"))
     )
 
@@ -141,6 +153,7 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument("namespace", default_value="", description="Namespace for the SLAM"),
         DeclareLaunchArgument("use_sim_time", default_value="true", description="Use simulation time when replaying rosbags with '--clock' option."),
         DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
         DeclareLaunchArgument("aggregate", default_value="true", description="Run aggregation node"),
@@ -156,6 +169,8 @@ def generate_launch_description():
         DeclareLaunchArgument("aggregated_cloud_topic", default_value="slam/aggregated_cloud", description="Topic to which to publish the aggregated point cloud"),
         DeclareLaunchArgument("clicked_point_topic", default_value="slam/clicked_point", description="Topic from which to get the clicked point"),
         DeclareLaunchArgument("set_slam_pose_topic", default_value="slam/set_slam_pose", description="Topic from which to set the SLAM pose"),
+        DeclareLaunchArgument("tf_topic", default_value="tf", description="Topic to which to publish the TF transform"),
+        DeclareLaunchArgument("tf_static_topic", default_value="tf_static", description="Topic to which to publish the TF static transform"),
 
         # Sensor Topics
         DeclareLaunchArgument("lidar_points_topic", default_value="lidar_points", description="Topic from which to get the point cloud"),
