@@ -775,14 +775,14 @@ Visualization Manager:
             - Alpha: 1
               Autocompute Intensity Bounds: true
               Autocompute Value Bounds:
-                Max Value: 10
-                Min Value: -10
+                Max Value: 10.121115684509277
+                Min Value: -0.7412924766540527
                 Value: true
               Axis: Z
               Channel Name: intensity
               Class: rviz_default_plugins/PointCloud2
               Color: 255; 255; 255
-              Color Transformer: Intensity
+              Color Transformer: AxisColor
               Decay Time: 0
               Enabled: true
               Invert Rainbow: false
@@ -809,14 +809,14 @@ Visualization Manager:
             - Alpha: 1
               Autocompute Intensity Bounds: true
               Autocompute Value Bounds:
-                Max Value: 10
-                Min Value: -10
+                Max Value: 9.901458740234375
+                Min Value: -2.5372326374053955
                 Value: true
               Axis: Z
               Channel Name: intensity
               Class: rviz_default_plugins/PointCloud2
               Color: 255; 255; 255
-              Color Transformer: Intensity
+              Color Transformer: AxisColor
               Decay Time: 0
               Enabled: true
               Invert Rainbow: false
@@ -1221,8 +1221,8 @@ Visualization Manager:
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
-            Max Value: 10.568790435791016
-            Min Value: -1.8344767093658447
+            Max Value: -9999
+            Min Value: 9999
             Value: true
           Axis: Z
           Channel Name: intensity
@@ -1335,7 +1335,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 71.86386108398438
+      Distance: 42.360923767089844
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -1350,10 +1350,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8547970056533813
+      Pitch: 0.8847965598106384
       Target Frame: base_link
       Value: Orbit (rviz_default_plugins)
-      Yaw: 3.123570203781128
+      Yaw: 3.143571615219116
     Saved: ~
 Window Geometry:
   Displays:

@@ -25,6 +25,10 @@ def generate_launch_description():
         DeclareLaunchArgument("config_filepath", default_value='/slam_config/slam.yaml', description="Path to the SLAM config file"),
         DeclareLaunchArgument("aggregation_config_filepath", default_value='/slam_config/aggregation.yaml', description="Path to the aggregation config file"),
 
+        DeclareLaunchArgument("update_maps", default_value="2", description="0: no update, 1: only add new points, 2: update"),
+        DeclareLaunchArgument("initial_maps", default_value="", description="path prefix to load maps from"),
+        DeclareLaunchArgument("ref_map", default_value="", description="Path to reference map"),
+
         # Topics
         DeclareLaunchArgument("slam_command_topic", default_value="slam/command", description="Topic to which to subscribe the SLAM command"),
         DeclareLaunchArgument("slam_confidence_topic", default_value="slam/confidence", description="Topic to which to publish the SLAM confidence"),
@@ -76,6 +80,9 @@ def generate_launch_description():
         'rviz': LaunchConfiguration('rviz'),
         'aggregate': LaunchConfiguration('aggregate'),
         'config_filepath' : LaunchConfiguration('config_filepath'),
+        'update_maps' : LaunchConfiguration('update_maps'),
+        'initial_maps' : LaunchConfiguration('initial_maps'),
+        'ref_map' : LaunchConfiguration('ref_map'),
         'aggregation_config_filepath' : LaunchConfiguration('aggregation_config_filepath'),
         'slam_command_topic' : LaunchConfiguration('slam_command_topic'),
         'slam_confidence_topic' : LaunchConfiguration('slam_confidence_topic'),
