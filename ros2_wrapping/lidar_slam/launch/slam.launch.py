@@ -119,8 +119,11 @@ def launch_setup(context, *args, **kwargs):
 
     # Outdoor Lidar SLAM node
     with open(config_file_path, 'r') as f:
-        params_slam_out = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
-    params_slam_out['use_sim_time'] = LaunchConfiguration("use_sim_time")
+        params_slam = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
+    params_slam['use_sim_time'] = LaunchConfiguration("use_sim_time")
+    params_slam['maps']['initial_maps'] = LaunchConfiguration("initial_maps")
+    params_slam['slam']['voxel_grid']['update_maps'] = LaunchConfiguration("update_maps")
+
 
     slam_node = Node(
         name="lidar_slam",
@@ -128,7 +131,7 @@ def launch_setup(context, *args, **kwargs):
         executable="lidar_slam_node",
         output="screen",
         namespace=namespace,
-        parameters=[params_slam_out],
+        parameters=[params_slam],
         remappings=resolved_remappings
     )
 
@@ -136,6 +139,10 @@ def launch_setup(context, *args, **kwargs):
     with open(aggregation_config_file_path, 'r') as f:
         params_aggregation = yaml.safe_load(f)['/aggregation']['ros__parameters']
     params_aggregation['use_sim_time'] = LaunchConfiguration("use_sim_time")
+    params_aggregation['obstacle']['ref_map_path'] = LaunchConfiguration("ref_map")
+    if LaunchConfiguration("ref_map").perform(context) != "":
+        params_aggregation['obstacle']['enable'] = True
+        params_aggregation['z_slice']['enable'] = True #to filter out ground
 
     aggregation_node = Node(
         name="aggregation",
@@ -159,6 +166,10 @@ def generate_launch_description():
         DeclareLaunchArgument("aggregate", default_value="true", description="Run aggregation node"),
         DeclareLaunchArgument("config_filepath", default_value=os.path.join(get_package_share_directory('lidar_slam'), 'params', 'slam_config_outdoor.yaml'), description="Path to the SLAM config file"),
         DeclareLaunchArgument("aggregation_config_filepath", default_value=os.path.join(get_package_share_directory('lidar_slam'), 'params', 'aggregation_config.yaml'), description="Path to the aggregation config file"),
+
+        DeclareLaunchArgument("update_maps", default_value="2", description="0: no update, 1: only add new points, 2: update"),
+        DeclareLaunchArgument("initial_maps", default_value="", description="path prefix to load maps from"),
+        DeclareLaunchArgument("ref_map", default_value="", description="Path to reference map"),
 
         # Topics
         DeclareLaunchArgument("slam_command_topic", default_value="slam/command", description="Topic to which to subscribe the SLAM command"),
