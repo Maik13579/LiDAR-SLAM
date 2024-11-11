@@ -1,15 +1,40 @@
 services:
   simulation:
     image: slam:testing_sim
+    container_name: husky_simulation
+    extends: .common
+    command: ros2 launch clearpath_gz simulation.launch.py setup_path:=/root/clearpath rviz:=true world:=myworld
+
+  velodyne_converter:
+    extends: .common
+    container_name: velodyne_converter
+    command: python3 /velodyne_converter.py
+
+  slam:
+    extends: .common
+    container_name: husky_slam
+    volumes:
+      - ./slam_config:/slam_config
+    command: ros2 launch /slam_config/slam_husky.launch.py
+
+  joystick:
+    extends: .common
+    container_name: husky_joystick
+    volumes:
+      - .:/config
+      - /dev:/dev #for joystick
+    command: ros2 launch teleop_twist_joy teleop-launch.py config_filepath:=/config/joystick.yaml joy_vel:=/husky/cmd_vel
+
+  .common:
+    image: slam:testing_sim
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: simulation
     privileged: true
     runtime: nvidia
     environment:
       DISPLAY: $DISPLAY
-      ROS_DOMAIN_ID: $ROS_DOMAIN_ID
+      ROS_DOMAIN_ID: 11
       QT_X11_NO_MITSHM: "1"
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,video,utility,graphics
@@ -18,13 +43,4 @@ services:
     ipc: host
     stdin_open: true
     volumes:
-      - /dev:/dev #for joystick
       - ./clearpath:/root/clearpath
-    command: ros2 launch clearpath_gz simulation.launch.py setup_path:=/root/clearpath rviz:=true world:=myworld
-
-  joystick:
-    extends: simulation
-    container_name: joystick
-    volumes:
-      - .:/config
-    command: ros2 launch teleop_twist_joy teleop-launch.py config_filepath:=/config/joystick.yaml joy_vel:=/husky/cmd_vel

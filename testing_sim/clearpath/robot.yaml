@@ -7,7 +7,7 @@ system:
       ip: 192.168.131.1
   ros2:
     namespace: husky
-    domain_id: 0
+    domain_id: 11
     middleware:
       implementation: rmw_fastrtps_cpp
     workspaces: []
