@@ -43,6 +43,16 @@ def launch_setup(context, *args, **kwargs):
     lidar_slam_share_path = get_package_share_directory('lidar_slam')
     rviz_config_path = os.path.join(lidar_slam_share_path, 'params', 'slam.rviz')
 
+    config_file_path = LaunchConfiguration("config_filepath").perform(context)
+    aggregation_config_file_path = LaunchConfiguration("aggregation_config_filepath").perform(context)
+
+    #check if paths are relative
+    if config_file_path[0] != '/':
+        config_file_path = os.path.join(lidar_slam_share_path, 'params', config_file_path)
+    if aggregation_config_file_path[0] != '/':
+        aggregation_config_file_path = os.path.join(lidar_slam_share_path, 'params', aggregation_config_file_path)
+
+
     remappings = [
         ("lidar_points", LaunchConfiguration("lidar_points_topic")),
         ("slam_command", LaunchConfiguration("slam_command_topic")),
@@ -98,37 +108,21 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # Outdoor Lidar SLAM node
-    with open(os.path.join(lidar_slam_share_path, 'params', "slam_config_outdoor.yaml"), 'r') as f:
+    with open(config_file_path, 'r') as f:
         params_slam_out = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
     params_slam_out['use_sim_time'] = LaunchConfiguration("use_sim_time")
 
-    slam_outdoor_node = Node(
+    slam_node = Node(
         name="lidar_slam",
         package="lidar_slam",
         executable="lidar_slam_node",
         output="screen",
         parameters=[params_slam_out],
-        remappings=remappings,
-        condition=IfCondition(LaunchConfiguration("outdoor"))
-    )
-
-    # Indoor Lidar SLAM node
-    with open(os.path.join(lidar_slam_share_path, 'params', "slam_config_indoor.yaml"), 'r') as f:
-        params_slam_in = yaml.safe_load(f)['/lidar_slam']['ros__parameters']
-    params_slam_in['use_sim_time'] = LaunchConfiguration("use_sim_time")
-
-    slam_indoor_node = Node(
-        name="lidar_slam",
-        package="lidar_slam",
-        executable="lidar_slam_node",
-        output="screen",
-        parameters=[params_slam_in],
-        remappings=remappings,
-        condition=UnlessCondition(LaunchConfiguration("outdoor"))
+        remappings=remappings
     )
 
     # Aggregate points
-    with open(os.path.join(lidar_slam_share_path, 'params', "aggregation_config.yaml"), 'r') as f:
+    with open(aggregation_config_file_path, 'r') as f:
         params_aggregation = yaml.safe_load(f)['/aggregation']['ros__parameters']
     params_aggregation['use_sim_time'] = LaunchConfiguration("use_sim_time")
 
@@ -142,15 +136,16 @@ def launch_setup(context, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("aggregate"))
     )
 
-    return [rviz_node, slam_outdoor_node, slam_indoor_node, aggregation_node]
+    return [rviz_node, slam_node, aggregation_node]
 
 
 def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("use_sim_time", default_value="true", description="Use simulation time when replaying rosbags with '--clock' option."),
         DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
-        DeclareLaunchArgument("outdoor", default_value="true", description="Use outdoor configuration for SLAM"),
         DeclareLaunchArgument("aggregate", default_value="true", description="Run aggregation node"),
+        DeclareLaunchArgument("config_filepath", default_value=os.path.join(get_package_share_directory('lidar_slam'), 'params', 'slam_config_outdoor.yaml'), description="Path to the SLAM config file"),
+        DeclareLaunchArgument("aggregation_config_filepath", default_value=os.path.join(get_package_share_directory('lidar_slam'), 'params', 'aggregation_config.yaml'), description="Path to the aggregation config file"),
 
         # Topics
         DeclareLaunchArgument("slam_command_topic", default_value="slam/command", description="Topic to which to subscribe the SLAM command"),

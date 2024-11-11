@@ -18,7 +18,6 @@ def generate_launch_description():
     # General args
     DeclareLaunchArgument("replay", default_value="true", description="Whether to process live or replayed data"),
     DeclareLaunchArgument("pointcloud2", default_value="false" , description="True if pointcloud message is in pointcloud2 format"),
-    DeclareLaunchArgument("outdoor", default_value="true", description="Decide which set of parameters to use."),
     DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
     DeclareLaunchArgument("tags_topic", default_value="tag_detections", description="Topic from which to get the tag measurements"),
     DeclareLaunchArgument("camera_topic", default_value="camera", description="topic from which to get the rgb camera data"),
@@ -35,7 +34,6 @@ def generate_launch_description():
     PythonLaunchDescriptionSource(slam_launch_path),
     launch_arguments={
         'use_sim_time': LaunchConfiguration('use_sim_time'),
-        'outdoor': LaunchConfiguration('outdoor'),
         'rviz': LaunchConfiguration('rviz'),
         'tags_topic': LaunchConfiguration('tags_topic'),
         'camera_topic': LaunchConfiguration('camera_topic'),

@@ -22,7 +22,6 @@ def generate_launch_description():
   ld = LaunchDescription([
     # General args
     DeclareLaunchArgument("replay", default_value="true", description="Whether to process live or replayed data"),
-    DeclareLaunchArgument("outdoor", default_value="true", description="Decide which set of parameters to use"),
     DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
     DeclareLaunchArgument("os_driver", default_value="false", description="If true, activate os_node."),
     DeclareLaunchArgument("tags_topic", default_value="tag_detections", description="Topic from which to get the tag measurements"),
@@ -43,7 +42,6 @@ def generate_launch_description():
     PythonLaunchDescriptionSource(slam_launch_path),
     launch_arguments={
         'use_sim_time': LaunchConfiguration('use_sim_time'),
-        'outdoor': LaunchConfiguration('outdoor'),
         'rviz': LaunchConfiguration('rviz'),
         'tags_topic': LaunchConfiguration('tags_topic'),
         'camera_topic': LaunchConfiguration('camera_topic'),
