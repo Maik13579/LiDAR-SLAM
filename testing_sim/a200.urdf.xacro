@@ -9,7 +9,7 @@
   
   <xacro:arg name="slip_compliance_lateral" default="0.2"/> <!--1.0-->
   <xacro:arg name="slip_compliance_longitudinal" default="0.2"/> <!--1.0-->
-  <xacro:arg name="max_speed" default="2.0"/> <!--1.0-->
+  <xacro:arg name="max_speed" default="1.0"/> <!--1.0-->
 
 
   <!-- Included URDF/XACRO Files -->

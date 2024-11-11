@@ -21,3 +21,10 @@ services:
       - /dev:/dev #for joystick
       - ./clearpath:/root/clearpath
     command: ros2 launch clearpath_gz simulation.launch.py setup_path:=/root/clearpath rviz:=true world:=myworld
+
+  joystick:
+    extends: simulation
+    container_name: joystick
+    volumes:
+      - .:/config
+    command: ros2 launch teleop_twist_joy teleop-launch.py config_filepath:=/config/joystick.yaml joy_vel:=/husky/cmd_vel
