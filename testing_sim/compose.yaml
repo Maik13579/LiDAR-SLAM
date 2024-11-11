@@ -3,7 +3,7 @@ services:
     image: slam:testing_sim
     container_name: husky_simulation
     extends: .common
-    command: ros2 launch clearpath_gz simulation.launch.py setup_path:=/root/clearpath rviz:=true world:=myworld
+    command: ros2 launch clearpath_gz simulation.launch.py setup_path:=/root/clearpath rviz:=false world:=myworld
 
   velodyne_converter:
     extends: .common
@@ -16,6 +16,13 @@ services:
     volumes:
       - ./slam_config:/slam_config
     command: ros2 launch /slam_config/slam_husky.launch.py
+
+  rviz:
+    extends: .common
+    container_name: husky_rviz
+    volumes:
+      - ./slam_config:/slam_config
+    command: rviz2 -d /slam_config/husky.rviz --ros-args -r __ns:=/husky -r /tf:=/husky/tf -r /tf_static:=/husky/tf_static -p slam_control_pannel.slam_command_topic:=slam/command -p slam_control_pannel.save_pc_service:=lidar_slam/save_pc -p slam_control_pannel.reset_service:=lidar_slam/reset -p slam_control_pannel.slam_confidence_topic:=slam/confidence
 
   joystick:
     extends: .common

@@ -20,7 +20,7 @@ def generate_launch_description():
   ld = LaunchDescription([
         DeclareLaunchArgument("namespace", default_value="husky", description="Namespace for the SLAM node"),
         DeclareLaunchArgument("use_sim_time", default_value="true", description="Use simulation time when replaying rosbags with '--clock' option."),
-        DeclareLaunchArgument("rviz", default_value="true", description="Visualize results with RViz."),
+        DeclareLaunchArgument("rviz", default_value="false", description="Visualize results with RViz."),
         DeclareLaunchArgument("aggregate", default_value="true", description="Run aggregation node"),
         DeclareLaunchArgument("config_filepath", default_value='/slam_config/slam.yaml', description="Path to the SLAM config file"),
         DeclareLaunchArgument("aggregation_config_filepath", default_value='/slam_config/aggregation.yaml', description="Path to the aggregation config file"),
@@ -60,10 +60,6 @@ def generate_launch_description():
         # Topic Obstacles
         DeclareLaunchArgument("obstacles_bboxes_topic", default_value="slam/obstacles/bboxes", description="Topic from which to get the obstacles bounding boxes"),
         DeclareLaunchArgument("obstacles_occupancy_grid_topic", default_value="slam/obstacles/occupancy_grid", description="Topic from which to get the obstacles occupancy grid"),
-
-        # Services
-        DeclareLaunchArgument("save_pc_service", default_value="slam/save_pc", description="Service to save pointcloud"),
-        DeclareLaunchArgument("reset_service", default_value="slam/reset", description="Service to reset SLAM"),
 
   ])
 
@@ -107,8 +103,6 @@ def generate_launch_description():
         'maps_blobs_topic' : LaunchConfiguration('maps_blobs_topic'),
         'obstacles_bboxes_topic' : LaunchConfiguration('obstacles_bboxes_topic'),
         'obstacles_occupancy_grid_topic' : LaunchConfiguration('obstacles_occupancy_grid_topic'),
-        'save_pc_service' : LaunchConfiguration('save_pc_service'),
-        'reset_service' : LaunchConfiguration('reset_service'),
         
     }.items()
   )
