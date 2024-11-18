@@ -15,8 +15,8 @@ services:
     container_name: husky_slam
     volumes:
       - ./slam_config:/slam_config
-    #command: ros2 launch /slam_config/slam_husky.launch.py 
-    command: ros2 launch /slam_config/slam_husky.launch.py update_maps:=0 initial_maps:=/slam_config/maps/map1_ ref_map:=/slam_config/maps/map1_297.pcd
+    command: ros2 launch /slam_config/slam_husky.launch.py 
+    #command: ros2 launch /slam_config/slam_husky.launch.py update_maps:=0 initial_maps:=/slam_config/maps/map1_ ref_map:=/slam_config/maps/map1_297.pcd
 
   rviz:
     extends: .common
