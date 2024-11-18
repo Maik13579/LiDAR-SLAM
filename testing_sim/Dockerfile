@@ -34,6 +34,8 @@ ENTRYPOINT ["/entrypoint.bash"]
 COPY world /world
 COPY world/myworld.sdf /root/clearpath_ws/install/clearpath_gz/share/clearpath_gz/worlds/myworld.sdf
 
-COPY a200.urdf.xacro /opt/ros/$ROS_DISTRO/share/clearpath_platform_description/urdf/a200/a200.urdf.xacro
+# Change slip_compliance_lateral and slip_compliance_longitudinal to be able to drive up slopes in sim
+RUN sed -i 's/<slip_compliance_lateral>[^<]*<\/slip_compliance_lateral>/<slip_compliance_lateral>0.2<\/slip_compliance_lateral>/g; s/<slip_compliance_longitudinal>[^<]*<\/slip_compliance_longitudinal>/<slip_compliance_longitudinal>0.2<\/slip_compliance_longitudinal>/g' /opt/ros/$ROS_DISTRO/share/clearpath_platform_description/urdf/a200/a200.urdf.xacro
+
 
 COPY velodyne_converter.py /velodyne_converter.py
