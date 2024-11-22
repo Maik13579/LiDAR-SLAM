@@ -1,5 +1,10 @@
 This is a fork from [Kitware](https://gitlab.kitware.com/keu-computervision/slam/-/tree/856af04ca3fd758b8f6fb2fc168d17aa63a3481d)
 
+This repository is used for personal purposes and includes modifications to the original project.  
+The original project is licensed under the Apache License 2.0, and its LICENSE file is retained in this repository.
+
+If you’re interested in this project, I highly recommend exploring the original version, as it is more thoroughly tested and maintained.
+
 ![SLAM in LidarView](doc/paraview_plugin.png)
 
 ![SLAM in ROS](doc/ros_node.png)
